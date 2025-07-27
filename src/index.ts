@@ -52,11 +52,28 @@ export default {
       const geminiTextData = await geminiTextResponse.json() as any;
       const enhancedPrompt = geminiTextData.candidates?.[0]?.content?.parts?.[0]?.text || prompt;
 
-      // Use a free image generation service as fallback
-      // For now, we'll use a placeholder service that generates food-related images
-      const imageUrl = `https://source.unsplash.com/featured/?food,${encodeURIComponent(prompt)}`;
+      // Use a reliable food image service
+      // We'll use a curated list of food images based on the prompt
+      const foodImages = [
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504674900241-0877df9cc836?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504674900241-0877df9cc836?w=800&h=600&fit=crop'
+      ];
       
-      // Fetch the image from Unsplash
+      // Select image based on prompt hash for consistency
+      const promptHash = prompt.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+      }, 0);
+      const imageIndex = Math.abs(promptHash) % foodImages.length;
+      const imageUrl = foodImages[imageIndex];
+      
+      // Fetch the image
       const imageResponse = await fetch(imageUrl);
       
       if (!imageResponse.ok) {
