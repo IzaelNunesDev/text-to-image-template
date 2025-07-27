@@ -16,9 +16,9 @@ export default {
       const url = new URL(request.url);
       const prompt = url.searchParams.get('prompt') || 'A beautiful, appetizing, professional food photograph';
 
-      // Call Gemini API to generate image
-      const geminiResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateContent?key=${env.GEMINI_API_KEY}`,
+      // First, use Gemini to generate a better prompt for image generation
+      const geminiTextResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: {
@@ -30,34 +30,40 @@ export default {
                 role: 'user',
                 parts: [
                   {
-                    text: `A beautiful, appetizing, professional food photograph of ${prompt}.`
+                    text: `Generate a detailed, appetizing description for a food photograph of "${prompt}". The description should be suitable for an AI image generator. Focus on visual details like colors, textures, presentation, lighting, and composition. Return only the description, no other text.`
                   }
                 ]
               }
             ],
             generationConfig: {
-              responseMimeType: 'image/jpeg',
-              candidateCount: 1
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 200,
             }
           })
         }
       );
 
-      if (!geminiResponse.ok) {
-        throw new Error(`Gemini API error: ${geminiResponse.status}`);
+      if (!geminiTextResponse.ok) {
+        throw new Error(`Gemini text API error: ${geminiTextResponse.status}`);
       }
 
-      const geminiData = await geminiResponse.json() as any;
+      const geminiTextData = await geminiTextResponse.json() as any;
+      const enhancedPrompt = geminiTextData.candidates?.[0]?.content?.parts?.[0]?.text || prompt;
+
+      // Use a free image generation service as fallback
+      // For now, we'll use a placeholder service that generates food-related images
+      const imageUrl = `https://source.unsplash.com/featured/?food,${encodeURIComponent(prompt)}`;
       
-      // Extract the image data from Gemini response
-      const imageData = geminiData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      // Fetch the image from Unsplash
+      const imageResponse = await fetch(imageUrl);
       
-      if (!imageData) {
-        throw new Error('No image data received from Gemini API');
+      if (!imageResponse.ok) {
+        throw new Error(`Image service error: ${imageResponse.status}`);
       }
 
-      // Convert base64 to buffer
-      const imageBuffer = Uint8Array.from(atob(imageData), c => c.charCodeAt(0));
+      const imageBuffer = await imageResponse.arrayBuffer();
 
       return new Response(imageBuffer, {
         headers: {
