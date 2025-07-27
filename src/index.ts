@@ -1,7 +1,5 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
 interface Env {
-    GEMINI_API_KEY: string;
+    AI: any;
 }
 
 export default {
@@ -22,47 +20,27 @@ export default {
             const url = new URL(request.url);
               const prompt = url.searchParams.get('prompt') || 'A beautiful, appetizing, professional food photograph';
 
-            // Initialize Google Generative AI
-            const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+            // Enhance the prompt for better image generation
+            const enhancedText = `Create a detailed, professional image of: ${prompt}. 
+            The image should be:
+            - High quality and visually appealing
+            - Well-lit and properly composed
+            - Professional and artistic
+            - Detailed and realistic`;
 
-            // First, enhance the prompt using Gemini
-            const geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-            const enhancedPrompt = await geminiModel.generateContent(`
-                    You are a professional food photographer. Create a detailed, appetizing description for a food photograph of: ${prompt}
-
-                                    The description should be:
-                                            - Specific and detailed
-                                                    - Focus on visual appeal and presentation
-                                                            - Include lighting, composition, and styling details
-                                                                    - Make the food look delicious and professional
-                                                                            - Keep it under 200 words
-
-                                                                                            Return only the enhanced description, nothing else.
-                                                                                                  `);
-
-            const enhancedText = enhancedPrompt.response.text();
-
-            // Generate image using Imagen 3
-            const imageModel = genAI.getGenerativeModel({ model: 'imagen-3.0-generate-002' });
-
-            const imageResult = await imageModel.generateImages({
+            // Generate image using Cloudflare Workers AI with Stable Diffusion
+            const imageResult = await env.AI.run('@cf/stabilityai/stable-diffusion-xl-base-1.0', {
                       prompt: enhancedText,
-                      numberOfImages: 1,
-                      outputMimeType: 'image/jpeg',
-                      aspectRatio: '4:3'
+                      num_steps: 20,
+                      width: 1024,
+                      height: 1024
             });
 
-            if (!imageResult.images || imageResult.images.length === 0) {
+            if (!imageResult) {
                       throw new Error('No image generated');
             }
 
-            const imageData = imageResult.images[0];
-
-            // Convert base64 to Uint8Array (compatible with Cloudflare Workers)
-            const imageBytes = Uint8Array.from(atob(imageData.data), c => c.charCodeAt(0));
-
-            return new Response(imageBytes, {
+            return new Response(imageResult, {
                       headers: {
                                   'content-type': 'image/jpeg',
                                   'Access-Control-Allow-Origin': '*',
