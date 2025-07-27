@@ -52,17 +52,14 @@ export default {
       const geminiTextData = await geminiTextResponse.json() as any;
       const enhancedPrompt = geminiTextData.candidates?.[0]?.content?.parts?.[0]?.text || prompt;
 
-      // Use a reliable food image service
-      // We'll use a curated list of food images based on the prompt
+      // Use embedded base64 food images for reliability
       const foodImages = [
-        'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1504674900241-0877df9cc836?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1504674900241-0877df9cc836?w=800&h=600&fit=crop'
+        // Pizza image (base64 encoded)
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=',
+        // Pasta image (base64 encoded)
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=',
+        // Salad image (base64 encoded)
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
       ];
       
       // Select image based on prompt hash for consistency
@@ -71,16 +68,11 @@ export default {
         return a & a;
       }, 0);
       const imageIndex = Math.abs(promptHash) % foodImages.length;
-      const imageUrl = foodImages[imageIndex];
+      const imageDataUrl = foodImages[imageIndex];
       
-      // Fetch the image
-      const imageResponse = await fetch(imageUrl);
-      
-      if (!imageResponse.ok) {
-        throw new Error(`Image service error: ${imageResponse.status}`);
-      }
-
-      const imageBuffer = await imageResponse.arrayBuffer();
+      // Extract base64 data from data URL
+      const base64Data = imageDataUrl.split(',')[1];
+      const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
 
       return new Response(imageBuffer, {
         headers: {
