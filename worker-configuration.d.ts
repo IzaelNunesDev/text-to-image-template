@@ -4,6 +4,7 @@
 declare namespace Cloudflare {
 	interface Env {
 		AI: Ai;
+		GEMINI_API_KEY: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
