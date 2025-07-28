@@ -36,16 +36,45 @@ npm install
 # Obter API key em: https://makersuite.google.com/app/apikey
 wrangler secret put GEMINI_API_KEY
 
-# Configurar Supabase (já configurado no wrangler.json)
-# SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET
+# Configurar Supabase
+wrangler secret put SUPABASE_KEY
 ```
 
-### 3. Desenvolvimento Local
+### 3. Configurar Variáveis de Ambiente
+Edite o arquivo `wrangler.json` e substitua os valores:
+```json
+{
+  "vars": {
+    "SUPABASE_URL": "YOUR_SUPABASE_URL",
+    "SUPABASE_BUCKET": "receitas"
+  }
+}
+```
+
+**⚠️ IMPORTANTE**: Nunca commite chaves de API diretamente no código. Use sempre `wrangler secret put` para chaves sensíveis.
+
+## 🔒 Segurança
+
+### Variáveis Sensíveis
+- `GEMINI_API_KEY`: Configure via `wrangler secret put GEMINI_API_KEY`
+- `SUPABASE_KEY`: Configure via `wrangler secret put SUPABASE_KEY`
+
+### Variáveis Públicas (podem ser commitadas)
+- `SUPABASE_URL`: URL do seu projeto Supabase
+- `SUPABASE_BUCKET`: Nome do bucket de storage
+
+### Checklist de Segurança
+- [ ] Chaves de API configuradas via `wrangler secret put`
+- [ ] URLs específicas substituídas por placeholders
+- [ ] Nenhuma chave real commitada no repositório
+- [ ] Variáveis de ambiente configuradas corretamente
+
+### 4. Desenvolvimento Local
 ```bash
 npm run dev
 ```
 
-### 4. Deploy
+### 5. Deploy
 ```bash
 npm run deploy
 ```
@@ -77,7 +106,7 @@ https://text-to-image-template.izaelnunesred.workers.dev
 O worker retorna um JSON com a URL da imagem:
 ```json
 {
-  "imageUrl": "https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_bolo_de_chocolate_caseiro_1234567890.jpg",
+  "imageUrl": "YOUR_SUPABASE_URL/storage/v1/object/public/receitas/ai_generated_bolo_de_chocolate_caseiro_1234567890.jpg",
   "success": true,
   "prompt": "Bolo de chocolate caseiro",
   "enhancedPrompt": "Professional food photography of a homemade chocolate cake...",
@@ -147,7 +176,7 @@ imageView.load(imageUrl) {
 ### Produção
 - **Worker URL**: `https://text-to-image-template.izaelnunesred.workers.dev`
 - **Interface Web**: `https://text-to-image-template.izaelnunesred.workers.dev/test-simple.html`
-- **Supabase Storage**: `https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/`
+- **Supabase Storage**: `YOUR_SUPABASE_URL/storage/v1/object/public/receitas/`
 
 ### Desenvolvimento
 - **Local**: `http://localhost:8787`
@@ -275,8 +304,8 @@ export default {
     "enabled": true
   },
   "vars": {
-    "SUPABASE_URL": "https://zfbkkrtpnoteapbxfuos.supabase.co",
-    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "SUPABASE_URL": "YOUR_SUPABASE_URL",
+    "SUPABASE_ANON_KEY": "YOUR_SUPABASE_ANON_KEY",
     "SUPABASE_BUCKET": "receitas"
   }
 }

@@ -12,7 +12,7 @@
 ```json
 {
   "success": true,
-  "imageUrl": "https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_bolo_de_chocolate_1753733712440.jpg",
+  "imageUrl": "YOUR_SUPABASE_URL/storage/v1/object/public/receitas/ai_generated_bolo_de_chocolate_1753733712440.jpg",
   "prompt": "bolo de chocolate",
   "enhancedPrompt": "A decadent chocolate cake, glistening with rich ganache, presented on a rustic wooden board. The cake is sliced, revealing a moist, dark chocolate crumb. Garnished with fresh raspberries and a dusting of cocoa powder. Professional food photography, shot with a Canon EOS 5D Mark IV, 50mm lens, f/2.8, ISO 100, natural light from a window, side angle, shallow depth of field, focus on the front slice, creating bokeh in the background. The lighting is soft and diffused, highlighting the textures of the cake and berries. Warm, inviting tones, emphasizing the richness of the chocolate.",
   "model": "stable-diffusion-xl-base-1.0-with-gemini-enhancement"
@@ -38,7 +38,7 @@
 
 ### ✅ Configurações Corretas
 - **Worker URL**: https://text-to-image-template.izaelnunesred.workers.dev
-- **Supabase URL**: https://zfbkkrtpnoteapbxfuos.supabase.co
+- **Supabase URL**: YOUR_SUPABASE_URL
 - **Bucket**: receitas (público)
 - **Chave**: SUPABASE_KEY configurada corretamente
 

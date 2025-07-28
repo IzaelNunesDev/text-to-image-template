@@ -27,14 +27,14 @@ export default {
             console.log('🎨 Iniciando geração de imagem...');
             console.log(`📝 Prompt original: ${originalPrompt}`);
 
-            // Step 1: Enhance the prompt using Gemini Flash
-            console.log('🔄 Passo 1: Aprimorando prompt com Gemini Flash...');
+            // Step 1: Enhance the prompt using Gemini 2.5 Flash-Lite
+            console.log('🔄 Passo 1: Aprimorando prompt com Gemini 2.5 Flash-Lite...');
             
             const { GoogleGenerativeAI } = await import('@google/generative-ai');
             const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
             
             const promptEnhancer = genAI.getGenerativeModel({ 
-                model: 'gemini-2.0-flash'
+                model: 'gemini-2.5-flash-lite'
             });
 
             const enhancementPrompt = `You are a professional food photographer and AI prompt engineer. 
@@ -93,7 +93,7 @@ export default {
                 imageUrl: imageUrl,
                 prompt: originalPrompt,
                 enhancedPrompt: enhancedPrompt,
-                model: 'stable-diffusion-xl-base-1.0-with-gemini-enhancement'
+                model: 'stable-diffusion-xl-base-1.0-with-gemini-2.5-flash-lite-enhancement'
             }), {
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export default {
                 success: false, // Adicionando campo success para compatibilidade com app Android
                 error: 'Failed to generate image',
                 message: error.message,
-                model: 'stable-diffusion-xl-base-1.0-with-gemini-enhancement'
+                model: 'stable-diffusion-xl-base-1.0-with-gemini-2.5-flash-lite-enhancement'
             }), {
                 status: 500,
                 headers: {

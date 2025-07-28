@@ -42,7 +42,7 @@ Resposta esperada:
 ```json
 {
   "success": true,
-  "imageUrl": "https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_bolo_de_chocolate_1234567890.jpg",
+  "imageUrl": "YOUR_SUPABASE_URL/storage/v1/object/public/receitas/ai_generated_bolo_de_chocolate_1234567890.jpg",
   "prompt": "bolo de chocolate",
   "enhancedPrompt": "cinematic food photography, bolo de chocolate, ultra-detailed, 8k, photorealistic, professional lighting",
   "model": "stable-diffusion-xl-base-1.0-with-gemini-enhancement"
@@ -95,7 +95,7 @@ Log.d(TAG, "🖼️ URL da imagem retornada: $imageUrl");
 ## 🔗 URLs Importantes
 
 - **Worker**: https://text-to-image-template.izaelnunesred.workers.dev
-- **Supabase**: https://zfbkkrtpnoteapbxfuos.supabase.co
+- **Supabase**: YOUR_SUPABASE_URL
 - **Bucket**: receitas
 
 ## 📋 Próximos Passos
