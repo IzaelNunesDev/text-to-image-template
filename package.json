@@ -17,6 +17,7 @@
     "publish": true
   },
   "devDependencies": {
+    "@types/node": "^24.1.0",
     "typescript": "5.8.3",
     "wrangler": "4.21.x"
   },
@@ -27,6 +28,7 @@
     "dev": "wrangler dev"
   },
   "dependencies": {
+    "@google/genai": "^1.11.0",
     "@google/generative-ai": "^0.24.1"
   }
 }

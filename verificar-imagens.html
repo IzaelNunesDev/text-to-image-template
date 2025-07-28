@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Imagens - Supabase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .image-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .image-container h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .url-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            color: #721c24;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Verificar Imagens - Supabase</h1>
+        
+        <div class="success">
+            ✅ <strong>TESTE CONCLUÍDO COM SUCESSO!</strong><br>
+            As imagens foram geradas e estão disponíveis no Supabase Storage.
+        </div>
+
+        <h2>📊 Imagens Geradas:</h2>
+
+        <div class="image-container">
+            <h3>🍰 Bolo de Chocolate Caseiro</h3>
+            <div class="url-info">
+                URL: https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_Bolo_de_chocolate_caseiro_1753650166361.jpg
+            </div>
+            <img src="https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_Bolo_de_chocolate_caseiro_1753650166361.jpg" 
+                 alt="Bolo de Chocolate Caseiro" 
+                 onerror="this.parentElement.innerHTML += '<div class=\'error\'>❌ Erro ao carregar imagem</div>'">
+        </div>
+
+        <div class="image-container">
+            <h3>🍕 Pizza Margherita Caseira</h3>
+            <div class="url-info">
+                URL: https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_Pizza_margherita_caseira_1753650207851.jpg
+            </div>
+            <img src="https://zfbkkrtpnoteapbxfuos.supabase.co/storage/v1/object/public/receitas/ai_generated_Pizza_margherita_caseira_1753650207851.jpg" 
+                 alt="Pizza Margherita Caseira" 
+                 onerror="this.parentElement.innerHTML += '<div class=\'error\'>❌ Erro ao carregar imagem</div>'">
+        </div>
+
+        <h2>📋 Resumo do Teste:</h2>
+        
+        <div class="success">
+            <strong>✅ Funcionalidades Testadas:</strong><br>
+            • Geração de imagens com Stable Diffusion XL<br>
+            • Aprimoramento de prompts com Gemini Flash<br>
+            • Upload automático para Supabase Storage<br>
+            • URLs públicas acessíveis<br>
+            • Compatibilidade com navegadores web<br>
+            • Nomes de arquivo únicos com timestamp<br>
+            • Sanitização de prompts no nome do arquivo
+        </div>
+
+        <h2>🎯 Próximos Passos:</h2>
+        
+        <div class="image-container">
+            <strong>📱 Integração com Android:</strong><br>
+            1. Modificar o ImageGenerationService.kt no Android<br>
+            2. Extrair a URL da resposta JSON<br>
+            3. Usar a URL diretamente com Coil<br>
+            4. Testar se as imagens aparecem nos cards
+        </div>
+
+        <h2>🔗 URLs Importantes:</h2>
+        
+        <div class="url-info">
+            <strong>Worker:</strong> https://text-to-image-template.izaelnunesred.workers.dev<br>
+            <strong>Supabase:</strong> https://zfbkkrtpnoteapbxfuos.supabase.co<br>
+            <strong>Bucket:</strong> receitas (público)
+        </div>
+    </div>
+</body>
+</html> 
