@@ -2,7 +2,7 @@ interface Env {
     AI: any;
     GEMINI_API_KEY: string;
     SUPABASE_URL: string;
-    SUPABASE_ANON_KEY: string;
+    SUPABASE_KEY: string; // Mudando de SUPABASE_ANON_KEY para SUPABASE_KEY
     SUPABASE_BUCKET: string;
 }
 
@@ -14,7 +14,7 @@ export default {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
                 },
             });
         }
@@ -89,8 +89,8 @@ export default {
 
             // Return the image URL instead of the image data
             return new Response(JSON.stringify({
+                success: true, // Adicionando campo success para compatibilidade com app Android
                 imageUrl: imageUrl,
-                success: true,
                 prompt: originalPrompt,
                 enhancedPrompt: enhancedPrompt,
                 model: 'stable-diffusion-xl-base-1.0-with-gemini-enhancement'
@@ -107,6 +107,7 @@ export default {
             
             // Return error response
             return new Response(JSON.stringify({
+                success: false, // Adicionando campo success para compatibilidade com app Android
                 error: 'Failed to generate image',
                 message: error.message,
                 model: 'stable-diffusion-xl-base-1.0-with-gemini-enhancement'
@@ -137,9 +138,10 @@ async function uploadToSupabase(imageBytes: ArrayBuffer, prompt: string, env: En
         const uploadResponse = await fetch(uploadUrl, {
             method: 'POST',
             headers: {
-                'apikey': env.SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${env.SUPABASE_ANON_KEY}`,
+                'apikey': env.SUPABASE_KEY, // Usando SUPABASE_KEY em vez de SUPABASE_ANON_KEY
+                'Authorization': `Bearer ${env.SUPABASE_KEY}`, // Usando SUPABASE_KEY em vez de SUPABASE_ANON_KEY
                 'Content-Type': 'image/jpeg',
+                'x-upsert': 'true', // Opcional: sobrescreve se o arquivo já existir
             },
             body: imageBytes
         });

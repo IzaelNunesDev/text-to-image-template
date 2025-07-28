@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Final - Worker + Supabase</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f0f8ff;
+            border-left: 4px solid #007acc;
+        }
+        .error {
+            background: #fff5f5;
+            border-left: 4px solid #e53e3e;
+        }
+        .success {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .generated-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Final - Worker + Supabase</h1>
+        
+        <div class="test-section">
+            <h2>📝 Teste de Geração de Imagem</h2>
+            <p>Este teste verifica se o Worker está funcionando corretamente com a nova implementação que:</p>
+            <ul>
+                <li>✅ Melhora o prompt usando Gemini</li>
+                <li>✅ Gera imagem com Stable Diffusion XL</li>
+                <li>✅ Faz upload para Supabase Storage</li>
+                <li>✅ Retorna JSON com URL do Supabase</li>
+            </ul>
+            
+            <div class="input-group">
+                <label for="prompt">Digite um prompt para teste:</label>
+                <input type="text" id="prompt" value="bolo de chocolate caseiro" placeholder="Ex: bolo de chocolate caseiro">
+            </div>
+            
+            <button onclick="testWorker()" id="testBtn">🚀 Testar Worker</button>
+            
+            <div id="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Status do Sistema</h2>
+            <div id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        const WORKER_URL = 'https://text-to-image-template.izaelnunesred.workers.dev';
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function showResult(content, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="result ${type}">${content}</div>`;
+            resultDiv.style.display = 'block';
+        }
+        
+        async function testWorker() {
+            const prompt = document.getElementById('prompt').value;
+            const testBtn = document.getElementById('testBtn');
+            
+            if (!prompt.trim()) {
+                showResult('❌ Por favor, digite um prompt válido.', 'error');
+                return;
+            }
+            
+            // Desabilitar botão e mostrar loading
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="loading"></span> Gerando imagem...';
+            
+            updateStatus('🔄 Iniciando teste...', 'info');
+            
+            try {
+                updateStatus('📡 Fazendo requisição para o Worker...', 'info');
+                
+                const encodedPrompt = encodeURIComponent(prompt);
+                const url = `${WORKER_URL}?prompt=${encodedPrompt}`;
+                
+                console.log('🌐 URL da requisição:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                updateStatus(`📊 Response Code: ${response.status}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const responseText = await response.text();
+                console.log('📄 Resposta completa:', responseText);
+                
+                let responseData;
+                try {
+                    responseData = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Erro ao parsear JSON: ${e.message}. Resposta: ${responseText}`);
+                }
+                
+                updateStatus('✅ Resposta JSON recebida com sucesso!', 'success');
+                
+                // Verificar se a resposta tem a estrutura esperada
+                if (!responseData.success) {
+                    throw new Error(`Worker retornou success: false. Erro: ${responseData.error || 'Erro desconhecido'}`);
+                }
+                
+                if (!responseData.imageUrl) {
+                    throw new Error('Resposta não contém imageUrl');
+                }
+                
+                // Mostrar resultado
+                let resultHtml = `
+                    <h3>🎉 Teste Concluído com Sucesso!</h3>
+                    <p><strong>Prompt Original:</strong> ${responseData.prompt}</p>
+                    <p><strong>Prompt Aprimorado:</strong> ${responseData.enhancedPrompt}</p>
+                    <p><strong>Modelo:</strong> ${responseData.model}</p>
+                    <p><strong>URL da Imagem:</strong> <a href="${responseData.imageUrl}" target="_blank">${responseData.imageUrl}</a></p>
+                    
+                    <div class="image-container">
+                        <h4>🖼️ Imagem Gerada:</h4>
+                        <img src="${responseData.imageUrl}" alt="Imagem gerada" class="generated-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <p style="display:none; color:red;">❌ Erro ao carregar imagem. Verifique a URL.</p>
+                    </div>
+                    
+                    <h4>📋 Resposta JSON Completa:</h4>
+                    <div class="json-display">${JSON.stringify(responseData, null, 2)}</div>
+                `;
+                
+                showResult(resultHtml, 'success');
+                updateStatus('✅ Teste concluído com sucesso! Worker funcionando perfeitamente.', 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro no teste:', error);
+                
+                let errorMessage = `❌ Erro no teste: ${error.message}`;
+                
+                if (error.message.includes('fetch')) {
+                    errorMessage += '<br><br>🔍 Possíveis causas:<br>';
+                    errorMessage += '• Worker não está acessível<br>';
+                    errorMessage += '• Problema de rede<br>';
+                    errorMessage += '• Worker não foi deployado corretamente';
+                }
+                
+                showResult(errorMessage, 'error');
+                updateStatus('❌ Teste falhou. Verifique os logs.', 'error');
+            } finally {
+                // Reabilitar botão
+                testBtn.disabled = false;
+                testBtn.innerHTML = '🚀 Testar Worker';
+            }
+        }
+        
+        // Teste inicial de conectividade
+        window.addEventListener('load', async () => {
+            updateStatus('🔍 Verificando conectividade com o Worker...', 'info');
+            
+            try {
+                const response = await fetch(`${WORKER_URL}?prompt=test`);
+                updateStatus(`✅ Worker acessível (Status: ${response.status})`, 'success');
+            } catch (error) {
+                updateStatus(`❌ Worker não acessível: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html> 
